@@ -1,126 +1,73 @@
 #include <stdio.h>
-#include <stdlib.h>
-#define MAX_VERTICES 100
-struct Node
-{
-    int vertex;
-    struct Node *next;
-};
-
-struct Graph
-{
-    int num_vertices;
-    struct Node *adj_list[MAX_VERTICES];
-    int visited[MAX_VERTICES];
-    int start_time[MAX_VERTICES];
-    int end_time[MAX_VERTICES];
-    int time;
-};
-void initializeGraph(struct Graph *G, int num_vertices)
-{
-    G->num_vertices = num_vertices;
-    for (int i = 0; i < num_vertices; ++i)
-    {
-        G->adj_list[i] = NULL;
-        G->visited[i] = 0;
-        G->start_time[i] = 0;
-        G->end_time[i] = 0;
-    }
-    G->time = 0;
-}
-void addEdge(struct Graph *G, int src, int dest)
-{
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    newNode->vertex = dest;
-    newNode->next = G->adj_list[src];
-    G->adj_list[src] = newNode;
-}
-void DFS_VISIT(struct Graph *G, int u)
-{
-    G->visited[u] = 1;
-    G->start_time[u] = ++(G->time);
-    printf("%d ", u);
-    struct Node *temp = G->adj_list[u];
-    while (temp != NULL)
-    {
-        int v = temp->vertex;
-        if (!G->visited[v])
-        {
-            DFS_VISIT(G, v);
-        }
-        temp = temp->next;
-    }
-    G->end_time[u] = ++(G->time);
-}
-void DFS(struct Graph *G)
-{
-    printf("DFS Traversal: ");
-    for (int i = 0; i < G->num_vertices; ++i)
-    {
-        if (!G->visited[i])
-        {
-            DFS_VISIT(G, i);
-        }
-    }
-    printf("\n");
-    printf("Node\tStart Time\tEnd Time\n");
-    for (int i = 0; i < G->num_vertices; ++i)
-    {
-        printf("%d\t%d\t\t%d\n", i, G->start_time[i], G->end_time[i]);
-    }
-}
-void BFS(struct Graph *G, int start_vertex)
-{
-    printf("BFS Traversal: ");
-    int queue[MAX_VERTICES];
-    int front = 0, rear = -1;
-    G->visited[start_vertex] = 1;
-    printf("%d ", start_vertex);
-    queue[++rear] = start_vertex;
-    while (front <= rear)
-    {
-        int u = queue[front++];
-        struct Node *temp = G->adj_list[u];
-        while (temp != NULL)
-        {
-            int v = temp->vertex;
-            if (!G->visited[v])
-            {
-                G->visited[v] = 1;
-                printf("%d ", v);
-                queue[++rear] = v;
-            }
-            temp = temp->next;
-        }
-    }
-    printf("\n");
-}
+#define MAX 10
 int main()
 {
-    struct Graph G;
-    int num_vertices, num_edges;
-
-    printf("Enter number of vertices: ");
-    scanf("%d", &num_vertices);
-    printf("Enter the number of edges:");
-    scanf("%d", &num_edges);
-    initializeGraph(&G, num_vertices);
-    printf("Enter edges (vertex u and v connected): \n");
-    for (int i = 0; i < num_edges; ++i)
+    int vertex_array[MAX], counter;
+    int vertex_count = 0;
+    int row, column;
+    int cost_matrix[MAX][MAX];
+    int visited[MAX] = {0};
+    int edge_count = 0, count = 1;
+    int sum_cost = 0, min_cost = 0;
+    int row_no, column_no, vertex1, vertex2;
+    printf("Total no of vertex :: ");
+    scanf("%d", &vertex_count);
+    printf("\n-- Enter vertex -- \n\n");
+    for (counter = 1; counter <= vertex_count; counter++)
     {
-        int u, v;
-        scanf("%d %d", &u, &v);
-        addEdge(&G, u, v);
+        printf("vertex[%d] :: ", counter);
+        scanf("%d", &vertex_array[counter]);
     }
-    DFS(&G);
+    printf("\n--- Enter Cost matrix of size %d x %d ---\n\n", vertex_count, vertex_count);
+    printf("\n\t-- format is --\n");
+    for (row = 1; row <= vertex_count; row++)
+    {
+        for (column = 1; column <= vertex_count; column++)
+        {
+            printf("x ");
+        }
+        printf("\n");
+    }
+    printf("\n-- MATRIX --\n\n");
+    for (row = 1; row <= vertex_count; row++)
+    {
+        for (column = 1; column <= vertex_count; column++)
+        {
+            scanf("%d", &cost_matrix[row][column]);
+            if (cost_matrix[row][column] == 0)
+            {
+                cost_matrix[row][column] = 999;
+            }
+        }
+    }
     printf("\n");
-    for (int i = 0; i < G.num_vertices; ++i)
+    visited[1] = 1;
+    edge_count = vertex_count - 1;
+    while (count <= edge_count)
     {
-        G.visited[i] = 0;
+        for (row = 1, min_cost = 999; row <= vertex_count; row++)
+        {
+            for (column = 1; column <= vertex_count; column++)
+            {
+                if (cost_matrix[row][column] < min_cost)
+                {
+                    if (visited[row] != 0)
+                    {
+                        min_cost = cost_matrix[row][column];
+                        vertex1 = row_no = row;
+                        vertex2 = column_no = column;
+                    }
+                }
+            }
+        }
+        if (visited[row_no] == 0 || visited[column_no] == 0)
+        {
+            printf("\nEdge %d is (%d -> %d)with cost:%d", count++, vertex_array[vertex1], vertex_array[vertex2], min_cost);
+            sum_cost = sum_cost + min_cost;
+            visited[column_no] = 1;
+        }
+        cost_matrix[vertex1][vertex2] = cost_matrix[vertex2][vertex1] = 999;
     }
-    int start_vertex;
-    printf("Enter the starting vertex for BFS: ");
-    scanf("%d", &start_vertex);
-    BFS(&G, start_vertex);
+    printf("\n\nMinimum cost=%d", sum_cost);
     return 0;
 }

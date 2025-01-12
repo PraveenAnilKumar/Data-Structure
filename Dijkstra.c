@@ -1,79 +1,69 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#define INFINITY 9999 
+#define MAX 10 
 
-#define MAX 10
+void dijkstra(int G[MAX][MAX],int n,int startnode); 
 
-int parent[MAX];
+int main() { 
+	int G[MAX][MAX],i,j,n,u;
+	printf("Enter no. of vertices:");
+	scanf("%d",&n); 
+	printf("\nEnter the adjacency matrix:\n"); 
+	
+	for(i=0;i<n;i++) 
+		for(j=0;j<n;j++) 
+			scanf("%d",&G[i][j]); 
+			
+	printf("\nEnter the starting node:"); 
+	scanf("%d",&u); 
+	dijkstra(G,n,u);  
+} 
 
-int find(int i)
-{
-    while (parent[i])
-        i = parent[i];
-    return i;
-}
-
-int uni(int i, int j)
-{
-    if (i != j)
-    {
-        parent[j] = i;
-        return 1;
-    }
-    return 0;
-}
-
-int main()
-{
-    int vertex_count = 0;
-    int row, column;
-    int cost_matrix[MAX][MAX];
-    int edge_count = 0, count = 1;
-    int sum_cost = 0, min_cost;
-    int row_no, column_no, edge1, edge2;
-
-    printf("Implementation of Kruskal's algorithm\n\n");
-    printf("Total no of vertex :: ");
-    scanf("%d", &vertex_count);
-
-    for (row = 1; row <= vertex_count; row++)
-    {
-        for (column = 1; column <= vertex_count; column++)
-        {
-            scanf("%d", &cost_matrix[row][column]);
-            if (cost_matrix[row][column] == 0)
-            {
-                cost_matrix[row][column] = 999;
-            }
-        }
-    }
-
-    edge_count = vertex_count - 1;
-
-    while (count <= edge_count)
-    {
-        for (row = 1, min_cost = 999; row <= vertex_count; row++)
-        {
-            for (column = 1; column <= vertex_count; column++)
-            {
-                if (cost_matrix[row][column] < min_cost)
-                {
-                    min_cost = cost_matrix[row][column];
-                    edge1 = row_no = row;
-                    edge2 = column_no = column;
-                }
-            }
-        }
-
-        row_no = find(row_no);
-        column_no = find(column_no);
-
-        if (uni(row_no, column_no))
-        {
-            printf("\nEdge %d is (%d -> %d) with cost : %d ", count++, edge1, edge2, min_cost);
-            sum_cost = sum_cost + min_cost;
-        }
-        cost_matrix[edge1][edge2] = cost_matrix[edge2][edge1] = 999;
-    }
-    printf("\n Minimum cost=%d", sum_cost);
-    return 0;
+void dijkstra(int G[MAX][MAX],int n,int startnode){ 
+	int cost[MAX][MAX],distance[MAX],pred[MAX];
+ 	int visited[MAX],count,mindistance,nextnode,i,j;
+ 	
+  	for(i=0;i<n;i++)
+   		for(j=0;j<n;j++) 
+   			if(G[i][j]==0)
+    			cost[i][j]=INFINITY;
+	 		else cost[i][j]=G[i][j]; 
+	 		
+	 for(i=0;i<n;i++){ 
+	 	distance[i]=cost[startnode][i];
+	  	pred[i]=startnode; visited[i]=0; 
+	  } 
+	  
+	 distance[startnode]=0; 
+	 visited[startnode]=1;
+	 count=1; 
+	 
+	 while(count<n-1){
+	   mindistance=INFINITY; 
+	   for(i=0;i<n;i++) 
+	   if(distance[i]<mindistance&&!visited[i]) { 
+      		mindistance=distance[i]; 
+			nextnode=i; 
+	   } 
+	   visited[nextnode]=1;
+       for(i=0;i<n;i++) 
+        	if(!visited[i])
+        		if(mindistance+cost[nextnode][i]<distance[i]){
+    				distance[i]=mindistance+cost[nextnode][i];
+	 				pred[i]=nextnode;
+	  			} 
+	  count++;
+	}
+	   
+	   
+	for(i=0;i<n;i++ )
+		 if(i!=startnode){ 
+		  	printf("\nDistance of node %d = %d",i,distance[i]); 
+		  	printf("\nPath = %d",i); j=i ; 
+		  	
+		  do{
+		   	j=pred[j]; 
+		  	 printf(" <- %d",j); 
+		  }while(j!=startnode); 
+		} 
 }
